@@ -1,69 +1,25 @@
-import redis, json
 from flask import Flask, jsonify, request
+from flask_restful import Api
+from os import curdir
+from os.path import abspath
 
-from funcoes import login_Usuario#funcao implementada em outro arquivo
+#importar os Resources, que estao na outra pasta
+from Resources.Login import Login
+from Resources.Values import Values
+from Resources.Keys import Keys
 
-db = redis.Redis(host='localhost')#criando o ligamento com o banco REDIS
+abspath(curdir)#adicionar esse diretorio para achar os modulos em subpastas
 
-app = Flask(__name__)#passando a quem pertence a instancia de Flask
+#passando a quem pertence a instancia de Flask
+app = Flask(__name__)
+#Criando api
+api = Api(app)
 
-@app.route('/login', methods=['POST']) #criando uma rota post
-def login():
-    response = json.loads(request.data)#transformando em json
-    user = response['user']
-    password = response['password']
-    usuario, token = login_Usuario(user, password) #criando o token
+#Rotas da aplicacao
+api.add_resource(Login, '/login')
+api.add_resource(Values, '/values')
+api.add_resource(Keys, '/keys')
 
-    if usuario:
-        perfil = usuario['perfil']
-
-        #Postar no banco Chave-Valor as informacoes do usuario logado por 3hrs
-        key = perfil+':'+token.decode("utf-8")
-        value = json.dumps(usuario)#dicionario para json
-        try:
-            db.set(key, value, ex=60*60*3)#seg*min*hrs
-        except Exception as e:
-            print(e)
-            return jsonify({
-                            'status': 'Error',
-                            'Message': 'Erro ao gravar as informações no Banco'
-                           })
-
-        return jsonify({
-                        'status': 'Sucess',
-                        'Token': token
-                       })
-    else:
-        return jsonify({
-                        'status': 'Error',
-                        'Message': 'Usuario ou senha inválidos'
-                       })
-
-@app.route('/getValue', methods=['GET'])
-def getValue():
-    body = json.loads(request.data)
-    #O usuario esta buscando um valor especifico
-    if 'key' in body:
-        key = body['key']
-        return db.get(key)
-    #O usuario passar parte da chave, e ira receber tds com essa chave
-    elif 'key_f' in body:
-        key_f= body['key_f']
-        keys = db.keys(key_f+'*')
-
-        #pegando os valores a partir das chaves e colocando em um array de dicionarios
-        values = [json.loads(db.get(key.decode('utf-8'))) for key in keys]
-        return jsonify(values)
-    else:
-        return jsonify({
-                        'status': 'Error',
-                        'Message': 'Esperado os parametros key ou key_f'
-                       })
-
-@app.route('/lista', methods=['GET'])
-def listar():
-    return jsonify(db.keys('*'))
-
-
+#apenas o arquivo principal pode chamar essa funcao
 if __name__ == '__main__':
     app.run(debug=True)

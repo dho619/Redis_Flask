@@ -26,7 +26,7 @@ def decode_auth_token(auth_token):
 
 #Faz as validações de usuario e retorna o token
 def login_Usuario(user, password):
-    with open('db.json') as arq:
+    with open('db/db.json') as arq:
         usuarios = json.load(arq)
     usuario = [ u for u in usuarios if u['user'] == user]
     if len(usuario) > 0 and usuario[0]['password'] == password:

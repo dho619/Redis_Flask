@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "user": "user01",
+        "password": "123",
+        "nome": "João das Neves",
+        "email": "joao@dasneves.com",
+        "telefone": "553599856656",
+        "perfil": "aluno"
+    },
+    {
+        "id": 2,
+        "user": "user02",
+        "password": "123",
+        "nome": "Arya Stark",
+        "email": "arya@stark.com",
+        "telefone": "553588544523",
+        "perfil": "aluno"
+    },
+    {
+        "id": 3,
+        "user": "user03",
+        "password": "123",
+        "nome": "Sebastian",
+        "email": "sebastian@comum.com",
+        "telefone": "55359898656",
+        "perfil": "professor"
+    }
+
+]
